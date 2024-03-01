@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="formApp">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+    <style>
+        .btn-primary {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+
+        .error-message {
+            color: red;
+        }
+
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: auto;
+            background-color: black;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px 10px;
+            position: absolute;
+            z-index: 1;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+    </style>
+      <script>
+        var app = angular.module('formApp', []);
+
+        app.controller('formController', ['$scope', function($scope) {
+            $scope.items = []; // Initialize items array
+            $scope.editMode = false; // Initialize edit mode
+            $scope.formData = {}; // Initialize form data object
+
+            $scope.getGenderTooltip = function(gender) {
+                if (gender === 'Female') {
+                    return 'Female';
+                } else if (gender === 'Male') {
+                    return 'Male';
+                } else {
+                    return 'Unknown';
+                }
+            };
+
+            $scope.submitForm = function() {
+                if ($scope.myForm.$valid) {
+                    if ($scope.editMode) {
+                        // Update the selected item
+                        console.log('Update form data:', $scope.formData);
+                    } else {
+                        // Add new item
+                        console.log('Add form data:', $scope.formData);
+                    }
+                } else {
+                    console.log('Form validation failed.');
+                }
+            };
+
+            $scope.cancelEdit = function() {
+                if ($scope.editMode) {
+                    // Reset edit mode
+                    $scope.editMode = false;
+                } else {
+                    // Clear form data
+                    $scope.formData = {};
+                    $scope.myForm.$setPristine();
+                    $scope.myForm.$setUntouched();
+                }
+            };
+
+            $scope.editItem = function(item) {
+                // Fill form with selected item's data
+                $scope.formData = angular.copy(item);
+                // Set edit mode
+                $scope.editMode = true;
+            };
+        }]);
+    </script>
+</head>
+<body>
+    <h2>กรอกข้อมูล</h2>
+    <div ng-controller="formController">
+       
+        <form name="myForm" ng-submit="submitForm()" novalidate>
+            <label for="first_name">First Name:</label><br>
+            <input type="text" id="first_name" ng-model="myForm.firstName" ng-required="true"><br>
+            <div class="error-message" ng-show="myForm.first_name.$error.required">First name is required.</div><br>
+
+            <label for="last_name">Last Name:</label><br>
+            <input type="text" id="last_name" ng-model="myForm.lastName" ng-required="true"><br>
+            <div class="error-message" ng-show="myForm.last_name.$error.required">Last name is required.</div><br>
+
+            <label for="gender">Gender:</label><br>
+            <select id="gender" ng-model="myForm.gender" ng-required="true">
+                <option value="">-- Select --</option>
+                <option value="Female">Female</option>
+                <option value="Male">Male</option>
+                <option value="Unknown">Unknown</option>
+            </select><br>
+            <div class="error-message" ng-show="myForm.gender.$error.required">Gender is required.</div><br>
+
+            <label for="score">Score:</label><br>
+            <input type="number" id="score" ng-model="formData.score" ng-required="true"
+                   ng-pattern="/^[0-9]+(\.[0-9]{1,2})?$/" min="0" max="100"><br>
+            <div class="error-message" ng-show="myForm.score.$error.required">Score is required.</div>
+            <div class="error-message" ng-show="myForm.score.$error.pattern">Score must be a number with up to 2 decimal places.</div>
+            <div class="error-message" ng-show="myForm.score.$error.min">Minimum is 0.</div>
+            <div class="error-message" ng-show="myForm.score.$error.max">Maximum is 100.</div><br>
+
+            <button type="submit" class="btn-primary">Add</button>
+            <button type="button" class="btn-primary" ng-click="cancelEdit()">Clear</button>
+        </form>
+        <table>
+          <thead>
+              <tr>
+                  <th>Gender</th>
+                  <th>Score</th>
+                  <th>Actions</th>
+              </tr>
+          </thead>
+          <tbody>
+              <tr ng-repeat="item in items">
+              
+                  <td></td>
+                  <td>
+                      <button ng-click="editItem(item)" class="btn-primary">Add</button>
+                      <button ng-click="cancelEdit()" class="btn-primary">Clear</button>
+                  </td>
+              </tr>
+          </tbody>
+      </table>
+    </div>
+
+  
+</body>
+</html>
